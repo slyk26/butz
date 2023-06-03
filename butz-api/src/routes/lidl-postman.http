@@ -1,0 +1,24 @@
+POST http://localhost:8001/users
+Content-Type: application/x-user
+
+username:999
+
+###
+
+DELETE http://localhost:8001/users/users:wf5fj77nt6tvqih40ysn
+
+###
+
+PUT http://localhost:8001/users/users:4t77fmi9665tv7rvb3jf
+Content-Type: application/x-user
+
+hackerman:1337
+
+###
+
+GET http://localhost:8001/users/users:4t77fmi9665tv7rvb3jf/
+
+
+###
+
+GET http://localhost:8001/users
