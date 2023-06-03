@@ -44,6 +44,6 @@ impl DB {
 
     pub async fn update<T: Serialize + DeserializeOwned + Send + Sync + Identifiable>(&self, key: &str, mut obj: T) -> Result<Option<T>> {
         obj.set_id(key);
-        self.client.update(split_key(key)).await
+        self.client.update(split_key(key)).content(obj).await
     }
 }

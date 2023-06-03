@@ -4,6 +4,7 @@ use rocket::data::{self, Data, FromData, ToByteUnit};
 use rocket::http::{Status, ContentType};
 use surrealdb::sql::Thing;
 use crate::models::traits::Identifiable;
+use crate::utils::split_key;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct User {
@@ -26,10 +27,7 @@ impl Identifiable for User {
     }
 
     fn set_id(&mut self, key: &str) {
-        let (table, id) = match key.find(':') {
-            Some(i) => (&key[..i], &key[(i + 1)..]),
-            None => ("", "")
-        };
+        let (table, id) = split_key(key);
         self.id = Some(Thing::from((table, id)));
 
     }
