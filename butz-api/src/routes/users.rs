@@ -2,9 +2,9 @@ use std::io::Error;
 use rocket::http::Status;
 use rocket::serde::json::Json;
 use rocket::State;
-use butz_shared::models::User;
-use butz_shared::utils::new_error;
 use crate::db::DB;
+use crate::models::User;
+use crate::utils::new_error;
 
 const TABLE: &str = "users";
 

@@ -1,6 +1,8 @@
 mod cors;
 mod routes;
 mod db;
+mod utils;
+mod models;
 
 #[macro_use]
 extern crate rocket;

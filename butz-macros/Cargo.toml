@@ -1,11 +1,14 @@
 [package]
-name = "butz-shared"
+name = "butz-macros"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+proc-macro = true
+
 [dependencies]
-serde = { version = "1.0.163", features = ["derive"] }
-rocket = { version = "0.5.0-rc.3"}
-surrealdb = {version = "1.0.0-beta.9"}
+proc-macro3 = "0.1.1"
+quote = "1.0.28"
+syn = "2.0.18"
