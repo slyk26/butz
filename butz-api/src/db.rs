@@ -12,7 +12,7 @@ pub struct DB {
 
 impl DB {
     pub async fn new() -> Result<Self> {
-        let bob = Surreal::new::<Ws>("localhost:6969").await.unwrap();
+        let bob = Surreal::new::<Ws>("db:8000").await.unwrap();
 
         // TODO CHANGE TO ENV FILE AND IN COMPOSE TOO
         bob.signin(Root {

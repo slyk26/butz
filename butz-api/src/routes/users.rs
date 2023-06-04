@@ -41,7 +41,7 @@ pub async fn delete(db: &State<DB>, key: &str) -> Result<(Status, Json<User>), E
 #[put("/users/<key>", data = "<user>")]
 pub async fn update(db: &State<DB>, key: &str , user: User) -> Result<Status, Error>{
     if let Ok(Some(_)) = db.update(key, user).await {
-       return Ok(Status::NoContent)
+       return Ok(Status::Ok)
     }
     Err(new_error("Could not update user"))
 }

@@ -1,0 +1,4 @@
+[workspace]
+members = ["butz-api", "butz-macros"]
+default-members = ["butz-api"]
+resolver = "2"

@@ -1,9 +1,18 @@
 services:
+  api:
+    build: .
+    command:
+      - ./butz-api
+    container_name: butz-api
+    depends_on: [db]
+    ports:
+      - 8000:8000
+    links:
+      - db
+
   db:
     image: surrealdb/surrealdb:latest
     container_name: butz-db
-    ports:
-      - 6969:8000
     volumes:
       - ./database:/database
     command: start --user root --pass root file:/database
