@@ -1,0 +1,9 @@
+services:
+  db:
+    image: surrealdb/surrealdb:latest
+    container_name: butz-db-dev
+    ports:
+      - 8001:8000
+    volumes:
+      - ./database:/database
+    command: "start --user root --pass root file:/database"

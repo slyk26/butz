@@ -12,7 +12,8 @@ pub struct DB {
 
 impl DB {
     pub async fn new() -> Result<Self> {
-        let bob = Surreal::new::<Ws>("db:8000").await.unwrap();
+        let url = std::env::var("DB_URL").unwrap_or(String::from("localhost:8001"));
+        let bob = Surreal::new::<Ws>(url).await.unwrap();
 
         // TODO CHANGE TO ENV FILE AND IN COMPOSE TOO
         bob.signin(Root {

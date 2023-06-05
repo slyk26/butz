@@ -6,13 +6,18 @@ services:
     container_name: butz-api
     depends_on: [db]
     ports:
-      - 8000:8000
+      - 80:8000
     links:
       - db
+    environment:
+      - DB_URL=db:8000
+      - ENV=PROD
+    restart: always
 
   db:
     image: surrealdb/surrealdb:latest
     container_name: butz-db
     volumes:
       - ./database:/database
-    command: start --user root --pass root file:/database
+    command: "start --user root --pass root file:/database"
+    restart: always

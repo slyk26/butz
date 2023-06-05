@@ -20,11 +20,15 @@ fn hello() -> &'static str {
 #[launch]
 async fn rocket() -> Rocket<Build> {
     let db = DB::new().await.unwrap();
+    let env = std::env::var("ENV").unwrap_or(String::from("DEV"));
+    let mut config = Config { ..Config::debug_default() };
 
-    let config = Config {
-        address: Ipv4Addr::new(0, 0, 0, 0).into(),
-        ..Config::release_default()
-    };
+    if env.eq("PROD") {
+         config = Config {
+            address: Ipv4Addr::new(0, 0, 0, 0).into(),
+            ..Config::release_default()
+        };
+    }
 
     rocket::custom(config)
         .manage(db)
