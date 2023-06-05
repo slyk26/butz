@@ -13,22 +13,16 @@ pub struct DB {
 impl DB {
     pub async fn new() -> Result<Self> {
         let url = std::env::var("DB_URL").unwrap_or(String::from("localhost:8001"));
+        let bob = Surreal::new::<Ws>(url).await.unwrap();
 
-        match Surreal::new::<Ws>(url).await {
-          Ok(bob) => {
-              // TODO CHANGE TO ENV FILE AND IN COMPOSE TOO
-              bob.signin(Root {
-                  username: "root",
-                  password: "root",
-              }).await.unwrap();
+        // TODO CHANGE TO ENV FILE AND IN COMPOSE TOO
+        bob.signin(Root {
+            username: "root",
+            password: "root",
+        }).await.unwrap();
 
-              bob.use_ns("butz").use_db("butz").await.unwrap();
-              Ok(Self { client: Arc::from(bob) })
-          }
-            Err(_) => {
-                panic!("Database is not active/started!");
-            }
-        }
+        bob.use_ns("butz").use_db("butz").await.unwrap();
+        Ok(Self { client: Arc::from(bob) })
     }
 
     pub async fn get_all<T: Model>(&self, table: &str) -> Result<Vec<T>> {
