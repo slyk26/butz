@@ -2,3 +2,5 @@
 *target*
 *database*
 *.http
+/.idea
+*.iml
