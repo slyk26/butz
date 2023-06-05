@@ -33,11 +33,12 @@ async fn rocket() -> Rocket<Build> {
     rocket::custom(config)
         .manage(db)
         .attach(Cors)
-        .mount("/", routes![
-            hello,
+        .mount("/", routes![hello])
+        .mount("/api", routes![
             routes::users::get_all,
             routes::users::get,
             routes::users::add,
             routes::users::delete,
-            routes::users::update])
+            routes::users::update
+        ])
 }
