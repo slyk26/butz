@@ -2,7 +2,6 @@ use rocket::request::Request;
 use rocket::data::{self, Data, FromData};
 use rocket::serde::{Serialize, Deserialize};
 use surrealdb::sql::Thing;
-use crate::models::{FromError};
 use crate::utils::{parse, split_key};
 extern crate butz_macros;
 use crate::models::Model;
@@ -16,7 +15,7 @@ pub struct User {
 
 #[rocket::async_trait]
 impl<'r> FromData<'r> for User {
-    type Error = FromError;
+    type Error = std::io::Error;
 
     async fn from_data(req: &'r Request<'_>, data: Data<'r>) -> data::Outcome<'r, Self> {
         parse(req, data, String::from("x-user"), "user").await
