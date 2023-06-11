@@ -3,7 +3,6 @@ use rocket::data::{FromData, ToByteUnit};
 use rocket::{Data, data, Request};
 use rocket::http::{ContentType, Status};
 use serde::de::DeserializeOwned;
-use crate::models::FromError;
 
 pub fn split_key(key: &str) -> (&str, &str) {
     match key.find(':') {
@@ -16,8 +15,7 @@ pub fn new_error(msg: &str) -> Error {
     Error::new(ErrorKind::Other, msg)
 }
 
-pub async fn parse<'r, T: FromData<'r, Error = FromError> + DeserializeOwned>(req: &'r Request<'_>, data: Data<'r>, content_type: String, limit_key: &str) -> data::Outcome<'r, T> {
-    use FromError::*;
+pub async fn parse<'r, T: FromData<'r, Error = Error> + DeserializeOwned>(req: &'r Request<'_>, data: Data<'r>, content_type: String, limit_key: &str) -> data::Outcome<'r, T> {
     use rocket::outcome::Outcome::*;
 
     let user_ct = ContentType::new("application", content_type);
@@ -29,13 +27,13 @@ pub async fn parse<'r, T: FromData<'r, Error = FromError> + DeserializeOwned>(re
 
     let string = match data.open(limit).into_string().await {
         Ok(string) if string.is_complete() => string.into_inner(),
-        Ok(_) => return Failure((Status::PayloadTooLarge, TooLarge)),
-        Err(e) => return Failure((Status::InternalServerError, Io(e))),
+        Ok(_) => return Failure((Status::PayloadTooLarge, new_error(format!("Element is too large: max {}", limit).as_str()))),
+        Err(e) => return Failure((Status::InternalServerError, e)),
     };
 
     let v = match serde_json::from_str::<T>(string.as_str()) {
-        Ok(a) => {a}
-        Err(_) => { return Failure((Status::BadRequest, Io(new_error("Could not generate Struct"))))}
+        Ok(v) => v,
+        Err(_) => return Failure((Status::BadRequest, new_error("Could not generate Struct")))
     };
     Success(v)
 }

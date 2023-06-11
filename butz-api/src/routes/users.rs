@@ -1,6 +1,6 @@
 use rocket::http::Status;
 use rocket::serde::json::Json;
-use rocket::State;
+use rocket::{Route, State};
 
 use crate::db::DB;
 use crate::*;
@@ -18,3 +18,7 @@ post!("/users");
 delete!("/users/<key>");
 
 put!("/users/<key>");
+
+pub fn users_routes() -> Vec<Route> {
+    routes![get, get_all, delete, post, put]
+}

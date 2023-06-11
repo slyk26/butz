@@ -11,6 +11,7 @@ use std::net::Ipv4Addr;
 use rocket::{Build, Config, Rocket};
 use cors::*;
 use crate::db::DB;
+use crate::routes::users::users_routes;
 
 #[get("/")]
 fn hello() -> &'static str {
@@ -35,11 +36,5 @@ async fn rocket() -> Rocket<Build> {
         .manage(db)
         .attach(Cors)
         .mount("/", routes![hello])
-        .mount("/api", routes![
-            routes::users::get_all,
-            routes::users::get,
-            routes::users::add,
-            routes::users::delete,
-            routes::users::update
-        ])
+        .mount("/api", users_routes())
 }
