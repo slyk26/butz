@@ -30,7 +30,7 @@ impl DB {
     }
 
     pub async fn get<T: Model>(&self, key: &str) -> Result<Option<T>> {
-         self.client.select(split_key(key)).await
+        self.client.select(split_key(key)).await
     }
 
     pub async fn add<T: Model>(&self, table: &str, obj: T) -> Result<T> {
@@ -43,6 +43,6 @@ impl DB {
 
     pub async fn update<T: Model>(&self, key: &str, mut obj: T) -> Result<Option<T>> {
         obj.set_id(key);
-        self.client.update(split_key(key)).content(obj).await
+        self.client.update(split_key(key)).merge(obj).await
     }
 }

@@ -4,9 +4,9 @@ pub mod users;
 macro_rules! get_all {
     ($endpoint:literal) => {
         #[get($endpoint)]
-        pub async fn get_all(db: &State<DB>) -> Result<Json<Vec<Model>>, Error> {
+        pub async fn get_all(db: &State<DB>) -> Result<Json<Vec<Model>>, Status> {
             Ok(Json(db.get_all(TABLE)
-            .await.map_err(|_| new_error("Could not execute get_all"))?))
+            .await.map_err(|_| Status::InternalServerError)?))
         }
     }
 }
@@ -15,11 +15,12 @@ macro_rules! get_all {
 macro_rules! get {
     ($endpoint:literal) => {
         #[get($endpoint)]
-        pub async fn get(db: &State<DB>, key: &str) -> Result<Json<Model>, Error> {
-            if let Ok(Some(model)) = db.get(key).await {
-                return Ok(Json(model))
+        pub async fn get(db: &State<DB>, key: &str) -> Result<Json<Model>, Status> {
+            match db.get(key).await {
+                Ok(Some(model)) => Ok(Json(model)),
+                Ok(None) => Err(Status::NotFound),
+                Err(_) => Err(Status::InternalServerError)
             }
-            Err(new_error("Could not execute get"))
         }
     }
 }
@@ -28,11 +29,11 @@ macro_rules! get {
 macro_rules! post {
     ($endpoint:literal) => {
         #[post($endpoint, data = "<body>")]
-        pub async fn add(db: &State<DB>, body: Model) -> Result<(Status, Json<Model>), Error> {
+        pub async fn add(db: &State<DB>, body: Model) -> Result<(Status, Json<Model>), Status> {
             if let Ok(inserted) = db.add(TABLE, body).await {
                 return Ok((Status::Created, Json(inserted)))
             }
-            Err(new_error("Could not execute create"))
+            Err(Status::InternalServerError)
         }
     }
 }
@@ -41,11 +42,12 @@ macro_rules! post {
 macro_rules! delete {
     ($endpoint:literal) => {
         #[delete($endpoint)]
-        pub async fn delete(db: &State<DB>, key: &str) -> Result<(Status, Json<Model>), Error> {
-            if let Ok(Some(deleted)) = db.delete::<Model>(key).await {
-                return Ok((Status::Ok, Json(deleted)))
+        pub async fn delete(db: &State<DB>, key: &str) -> Result<(Status, Json<Model>), Status> {
+            match db.delete(key).await {
+                Ok(Some(model)) => Ok((Status::Ok, Json(model))),
+                Ok(None) => Err(Status::NotFound),
+                Err(_) => Err(Status::InternalServerError)
             }
-            Err(new_error("Could not execute delete"))
         }
     }
 }
@@ -54,11 +56,16 @@ macro_rules! delete {
 macro_rules! put {
     ($endpoint:literal) => {
         #[put($endpoint, data = "<body>")]
-        pub async fn update(db: &State<DB>, key: &str , body: Model) -> Result<Status, Error>{
-            if let Ok(Some(_)) = db.update(key, body).await {
-                return Ok(Status::Ok)
+        pub async fn update(db: &State<DB>, key: &str , body: Model) -> Result<Status, Status>{
+            match db.get::<Model>(key).await {
+                Ok(Some(_)) => {
+                    match db.update(key, body).await {
+                        Ok(Some(_)) => Ok(Status::Ok),
+                        _ => Err(Status::InternalServerError)
+                    }
+                }
+                _ => Err(Status::NotFound)
             }
-            Err(new_error("Could not execute update"))
         }
     }
 }

@@ -30,6 +30,7 @@ async fn rocket() -> Rocket<Build> {
         };
     }
 
+    // TODO: add limit for users
     rocket::custom(config)
         .manage(db)
         .attach(Cors)
