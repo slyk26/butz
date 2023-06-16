@@ -1,21 +1,22 @@
 mod cors;
-mod routes;
 mod db;
 mod utils;
 mod models;
+mod routes;
 
 #[macro_use]
 extern crate rocket;
 
 use std::net::Ipv4Addr;
 use rocket::{Build, Config, Rocket};
+use rocket::http::Status;
 use cors::*;
 use crate::db::DB;
-use crate::routes::users::users_routes;
+use crate::routes::users;
 
 #[get("/")]
-fn hello() -> &'static str {
-    "Hello, world!"
+fn healthcheck() -> Status {
+    Status::Ok
 }
 
 #[launch]
@@ -35,6 +36,6 @@ async fn rocket() -> Rocket<Build> {
     rocket::custom(config)
         .manage(db)
         .attach(Cors)
-        .mount("/", routes![hello])
-        .mount("/api", users_routes())
+        .mount("/", routes![healthcheck])
+        .mount("/api", users::routes())
 }
